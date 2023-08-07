@@ -1,10 +1,10 @@
 'use client'
 import { CardElement, useStripe, useElements, AddressElement } from '@stripe/react-stripe-js'
 import { useState } from 'react'
-// import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 export function CheckoutForm () {
-  // const router = useRouter()
+  const router = useRouter()
   const stripe = useStripe()
   const elements = useElements()
 
@@ -14,29 +14,34 @@ export function CheckoutForm () {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault()
-    // setButton('Loading...')
 
-    const clientSecret = await fetch('http://localhost:3000/api/create-payment-intent', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ products })
-    }).then(res => res.json())
+    const address = await elements?.getElement(AddressElement)?.getValue() as any
+    console.log(address)
 
-    const { error, paymentIntent }: any = await stripe?.confirmCardPayment(clientSecret, {
-      payment_method: {
-        card: elements?.getElement(CardElement)!,
-        billing_details: await elements?.getElement(AddressElement)?.getValue().then(res => res.value) as any
+    if (address.complete) {
+      setButton('Loading...')
+      const clientSecret = await fetch('http://localhost:3000/api/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ products })
+      }).then(res => res.json())
+
+      const { error, paymentIntent }: any = await stripe?.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: elements?.getElement(CardElement)!,
+          billing_details: await elements?.getElement(AddressElement)?.getValue().then(res => res.value) as any
+        }
+      })
+
+      if (!error) {
+        setError(null)
+        console.log(paymentIntent)
+        setButton('Success!')
+        router.push('/success')
+      } else {
+        setButton('Try again')
+        setError(error.message)
       }
-    })
-
-    if (!error) {
-      setError(null)
-      console.log(paymentIntent)
-      // setButton('Success!')
-      // router.push('/success')
-    } else {
-      setButton('Try again')
-      setError(error.message)
     }
   }
 
