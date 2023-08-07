@@ -1,10 +1,10 @@
 'use client'
 import { CardElement, useStripe, useElements, AddressElement } from '@stripe/react-stripe-js'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+// import { useRouter } from 'next/navigation'
 
 export function CheckoutForm () {
-  const router = useRouter()
+  // const router = useRouter()
   const stripe = useStripe()
   const elements = useElements()
 
@@ -35,7 +35,7 @@ export function CheckoutForm () {
       // setButton('Success!')
       // router.push('/success')
     } else {
-      setButton('Buy')
+      setButton('Try again')
       setError(error.message)
     }
   }
