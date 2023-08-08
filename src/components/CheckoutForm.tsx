@@ -65,6 +65,13 @@ export function CheckoutForm () {
             phone: {
               required: 'always'
             }
+          },
+          defaultValues: {
+            name: 'Juan',
+            address: {
+              country: 'CO',
+              city: 'Bogotá'
+            }
           }
         }}
       />
